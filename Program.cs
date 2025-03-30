@@ -1,7 +1,30 @@
+using Estonia.Data;
+using Microsoft.EntityFrameworkCore;
+
+using Estonia;
+
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+
+
+var appSettingsSection = builder.Configuration.GetSection("AppSettings");
+builder.Services.Configure<AppSettings>(appSettingsSection);
+builder.Services.Configure<AppSettings>(myOptions =>
+{
+    myOptions.ConnectionString = builder.Configuration.GetConnectionString("SqlConnection");
+});
+
+
+
+
+
+
+
 
 var app = builder.Build();
 
