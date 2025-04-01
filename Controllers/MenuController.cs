@@ -5,7 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using Estonia.Data;
 using System.Data;
 using Estonia.Models;
- 
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
+
 using System.Data.SqlClient;
 using Microsoft.Extensions.Options;
 
@@ -63,5 +66,124 @@ namespace Estonia.Controllers
 
             return menuViewModel;
         }
+
+
+ 
+        [HttpPost]
+        public IActionResult PlaceOrder([FromBody] List<OrderItem> cartItems)
+        {
+            if (cartItems == null || cartItems.Count == 0)
+            {
+                return BadRequest(new { Message = "Cart is empty." });  // Ensure JSON response
+            }
+
+            try
+            {
+                int orderId = SaveOrder(cartItems);
+                return Ok(new { Message = "Order placed successfully!", OrderId = orderId });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Error = "An error occurred", Details = ex.Message });  // Ensure JSON response
+            }
+        }
+
+        private int SaveOrder(List<OrderItem> cartItems)
+        {
+
+            var authHeader = HttpContext.Request.Headers["Authorization"].FirstOrDefault();
+
+            var userId = GetUserIdFromJwtToken(HttpContext);
+
+            if (userId == 0)
+            {
+                throw new UnauthorizedAccessException("Please log in to order.");
+            }
+
+
+            using (SqlConnection conn = new SqlConnection(_appSettings.ConnectionString))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand("Proc_InsertOrder", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@UserId", userId); // Replace with actual user ID if needed
+                cmd.Parameters.AddWithValue("@TotalAmount", cartItems.Sum(item => item.Price * item.Quantity));
+
+                int orderId = Convert.ToInt32(cmd.ExecuteScalar());
+
+                foreach (var item in cartItems)
+                {
+                    SqlCommand itemCmd = new SqlCommand("Proc_InsertOrderItem", conn);
+                    itemCmd.CommandType = CommandType.StoredProcedure;
+                    itemCmd.Parameters.AddWithValue("@OrderId", orderId);
+                    itemCmd.Parameters.AddWithValue("@MenuItemId", item.MenuItemId);
+                    itemCmd.Parameters.AddWithValue("@Quantity", item.Quantity);
+                    itemCmd.Parameters.AddWithValue("@Price", item.Price);
+                    itemCmd.ExecuteNonQuery();
+                }
+
+                return orderId;
+            }
+        }
+
+
+        // Helper method to extract user ID from JWT token
+        private int GetUserIdFromJwtToken(HttpContext httpContext)
+        {
+            try
+            {
+                // 1. Get token from header
+                var authHeader = httpContext.Request.Headers["Authorization"].FirstOrDefault();
+                Console.WriteLine($"Authorization Header: {authHeader}"); // Debugging line
+
+                if (string.IsNullOrEmpty(authHeader))
+                {
+                    Console.WriteLine("Authorization header is missing.");
+                    return 0;
+                }
+
+                var token = authHeader.Split(' ').Last();
+                Console.WriteLine($"Extracted Token: {token}"); // Debugging line
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    Console.WriteLine("Token is missing in Authorization header.");
+                    return 0;
+                }
+
+                // 2. Validate and decode token
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var jwtToken = tokenHandler.ReadJwtToken(token);
+
+                // 3. Try different common user ID claim types
+                var userIdClaim = jwtToken.Claims.FirstOrDefault(c =>
+                    c.Type == ClaimTypes.NameIdentifier ||
+                    c.Type == JwtRegisteredClaimNames.Sub ||
+                    c.Type == "userId" ||
+                    c.Type == "sub");
+
+                if (userIdClaim == null)
+                {
+                    Console.WriteLine("User ID claim not found in token.");
+                    return 0;
+                }
+
+                if (!int.TryParse(userIdClaim.Value, out int userId))
+                {
+                    Console.WriteLine($"Invalid User ID: {userIdClaim.Value}");
+                    return 0;
+                }
+
+                Console.WriteLine($"Extracted User ID: {userId}");
+                return userId;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error extracting user ID: {ex.Message}");
+                return 0;
+            }
+        }
+
+
     }
 }

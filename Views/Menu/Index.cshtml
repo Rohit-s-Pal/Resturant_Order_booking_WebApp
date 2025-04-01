@@ -20,6 +20,10 @@
         </div>
     </div>
     <!-- Navbar & Hero End -->
+
+
+
+
     <!-- Menu Start -->
     <div class="container-xxl py-5">
         <div class="container">
@@ -66,6 +70,11 @@
                                                 <span class="text-primary">$@item.Price</span>
                                             </h5>
                                             <small class="fst-italic">@item.Notes</small>
+
+                                            <button class="btn btn-primary btn-sm add-to-cart-btn" data-name="@item.Name" data-price="@item.Price" data-image="img/menu-1.jpg">
+                                                <i class="fa fa-cart-plus me-1"></i> Add to Cart
+                                            </button>
+
                                         </div>
                                     </div>
                                 </div>
@@ -79,4 +88,143 @@
         </div>
     </div>
     <!-- Menu End -->
-   
+<!-- Cart Page -->
+<div class="cart-page" id="cart-page">
+    <div class="cart-content">
+        <button class="close-cart" id="close-cart">Close</button>
+        <h2>Shopping Cart</h2>
+        <div id="cart-items"></div>
+        <div class="total-price">Cart Total: $<span id="cart-total">0.00</span></div>
+        <button class="cart-order-btn" id="cart-order-btn">Order Now</button>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        let cart = [];
+
+        const cartToggle = document.getElementById('cart-toggle');
+        const cartPage = document.getElementById('cart-page');
+        const closeCart = document.getElementById('close-cart');
+        const cartItems = document.getElementById('cart-items');
+        const cartCount = document.getElementById('cart-count');
+        const cartTotal = document.getElementById('cart-total');
+        const cartOrderBtn = document.getElementById('cart-order-btn');
+        const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+
+        function updateCart() {
+            cartItems.innerHTML = '';
+            let total = 0;
+            let itemCount = 0;
+
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<p>Your cart is empty</p>';
+            } else {
+                cart.forEach((item, index) => {
+                    const itemTotal = (item.price * item.quantity).toFixed(2);
+                    total += parseFloat(itemTotal);
+                    itemCount += item.quantity;
+
+                    cartItems.innerHTML += `
+                        <div class="cart-item">
+                            <div>
+                                <img src="${item.image}" alt="${item.name}" style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;">
+                                <span>${item.name}</span>
+                            </div>
+                            <div class="cart-quantity-control">
+                                <button class="qty-btn" onclick="changeCartQuantity(${index}, -1)">-</button>
+                                <span style="margin: 0 10px">${item.quantity}</span>
+                                <button class="qty-btn" onclick="changeCartQuantity(${index}, 1)">+</button>
+                            </div>
+                            <span>$${itemTotal}</span>
+                        </div>
+                    `;
+                });
+            }
+
+            cartCount.textContent = itemCount;
+            cartTotal.textContent = total.toFixed(2);
+            cartOrderBtn.disabled = cart.length === 0;
+        }
+
+        window.changeCartQuantity = function (index, change) {
+            let newQty = cart[index].quantity + change;
+            if (newQty < 1) {
+                cart.splice(index, 1);
+            } else {
+                cart[index].quantity = newQty;
+            }
+            updateCart();
+        }
+
+        addToCartButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const name = this.getAttribute('data-name');
+                const price = parseFloat(this.getAttribute('data-price'));
+                const image = this.getAttribute('data-image');
+
+                const existingItemIndex = cart.findIndex(item => item.name === name);
+                if (existingItemIndex >= 0) {
+                    cart[existingItemIndex].quantity += 1;
+                } else {
+                    cart.push({ name, price, image, quantity: 1 });
+                }
+                updateCart();
+            });
+        });
+
+        cartToggle.addEventListener('click', () => cartPage.style.display = 'block');
+        closeCart.addEventListener('click', () => cartPage.style.display = 'none');
+
+        cartPage.addEventListener('click', (e) => {
+            if (e.target === cartPage) cartPage.style.display = 'none';
+        });
+
+        cartOrderBtn.addEventListener('click', function () {
+            if (cart.length > 0) {
+                const token = localStorage.getItem("access_token");
+
+                if (!token) {
+                    alert("You are not authenticated. Please log in first.");
+                    return;
+                }
+
+                fetch('/Menu/PlaceOrder', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token  // ✅ Add token here
+                    },
+                    body: JSON.stringify(cart)
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.text().then(text => { throw new Error(text || "Unknown error"); });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.OrderId) {
+                            alert(`Order placed successfully! Order ID: ${data.OrderId}`);
+                            cart = [];
+                            updateCart();
+                            cartPage.style.display = 'none';
+                        } else {
+                            alert("Failed to place order. Please try again.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error placing order:', error);
+                        alert("Error placing order: " + error.message);
+                    });
+            } else {
+                alert("Your cart is empty!");
+            }
+        });
+
+
+
+        updateCart();
+    });
+
+</script>
