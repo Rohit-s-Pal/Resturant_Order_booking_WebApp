@@ -32,28 +32,343 @@
                 <h1 class="mb-5">Most Popular Items</h1>
             </div>
             <div class="tab-class text-center wow fadeInUp" data-wow-delay="0.1s">
-                <ul class="nav nav-pills d-inline-flex justify-content-center border-bottom mb-5">
-                    
-
-                      @foreach (var type in Model.MenuTypes)
-                {
-
-                    <li class="nav-item">
-                        <a class="d-flex align-items-center text-start mx-3 @(type == Model.MenuTypes.First() ? "ms-0 pb-3 active" : "pb-3")"
-                           data-bs-toggle="pill" href="#tab-@type.MenuTypeId">
-                            <i class="fa fa-utensils fa-2x text-primary"></i>
-                            <div class="ps-3">
-                                <small class="text-body">Special</small>
-                                <h6 class="mt-n1 mb-0">@type.Name</h6>
-                            </div>
-                        </a>
-                    </li>
-                }
-                   
 
 
+                <!-- Category Slider -->
+                <div class="category-slider-container">
+                    <div class="category-slider-wrapper">
+                        <button class="category-slider-btn category-prev-btn" id="category-prev-btn">&#10094;</button>
+                        <div class="category-slider" id="category-slider">
 
-                </ul>
+                                   @foreach (var type in Model.MenuTypes)
+                             {
+
+
+                                  <!-- Static categories with tab href structure -->
+                               <div class="category-slide" data-menutypeid="@type.MenuTypeId">
+                                    <a class="d-flex align-items-center text-start mx-3 ms-0 pb-3"
+                                       data-bs-toggle="pill" href="#tab-@type.MenuTypeId">
+                                    <i class="fa fa-hamburger fa-2x text-primary"></i>
+                                        <div class="ps-3">
+                                            <small class="text-body">Special</small>
+                                            <h6 class="mt-n1 mb-0">@type.Name</h6>
+                                        </div>
+                                    </a>
+                                </div>
+                              }
+
+                    </div>
+                    <button class="category-slider-btn category-next-btn" id="category-next-btn">&#10095;</button>
+                </div>
+                <div class="category-slider-dots" id="category-dots-container">
+                    <!-- Dots will be added dynamically -->
+                </div>
+            </div>
+                
+
+
+
+
+            <style>
+                
+
+/* Base Styles */
+body {
+    font-family: 'Nunito', sans-serif;
+    overflow-x: hidden;
+}
+
+/* Category Slider Styles */
+.category-slider-container {
+    position: relative;
+    width: 100%;
+    margin: 30px 0;
+    overflow: hidden;
+    height: auto;
+    padding: 10px 0;
+}
+
+.category-slider-wrapper {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+
+.category-slider {
+    display: flex;
+    transition: transform 0.5s ease;
+    will-change: transform;
+    padding: 10px 0;
+}
+
+.category-slide {
+    flex: 0 0 auto;
+    width: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: #333;
+    font-weight: bold;
+    padding: 15px;
+    text-align: center;
+    background: #f8f9fa;
+    margin: 0 5px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 1px solid #eee;
+}
+
+    .category-slide:hover {
+        background: #FEA116;
+        color: white;
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .category-slide.active {
+        background: #FEA116;
+        color: white;
+    }
+
+    .category-slide i {
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+
+.category-slider-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(254, 161, 22, 0.8);
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    font-size: 18px;
+    z-index: 10;
+    border-radius: 50%;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .category-slider-btn:hover {
+        background-color: #FEA116;
+        transform: translateY(-50%) scale(1.1);
+    }
+
+.category-prev-btn {
+    left: 0;
+}
+
+.category-next-btn {
+    right: 0;
+}
+
+.category-slider-dots {
+    position: relative;
+    text-align: center;
+    margin-top: 15px;
+}
+
+.category-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background-color: rgba(254, 161, 22, 0.3);
+    border-radius: 50%;
+    margin: 0 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+    .category-dot:hover {
+        transform: scale(1.2);
+    }
+
+    .category-dot.active {
+        background-color: #FEA116;
+        transform: scale(1.2);
+    }
+
+/* Menu Item Styles */
+.menu-item {
+    margin-bottom: 30px;
+    transition: all 0.3s;
+    display: none; /* Hidden by default, shown when category selected */
+}
+
+    .menu-item.show {
+        display: block;
+    }
+
+/* Responsive Adjustments */
+@@media (max-width: 768px) {
+    .category-slide {
+        width: 140px;
+        padding: 10px;
+    }
+
+        .category-slide i {
+            font-size: 20px;
+        }
+
+    .category-slider-btn {
+        width: 30px;
+        height: 30px;
+        font-size: 16px;
+    }
+}
+
+@@media (max-width: 576px) {
+    .category-slide {
+        width: 120px;
+        font-size: 14px;
+    }
+
+        .category-slide i {
+            font-size: 18px;
+        }
+}
+
+
+            </style>
+
+
+            <script>
+
+                document.addEventListener('DOMContentLoaded', function () {
+                    function initCategorySlider() {
+                        const slider = document.getElementById('category-slider');
+                        const prevBtn = document.getElementById('category-prev-btn');
+                        const nextBtn = document.getElementById('category-next-btn');
+                        const dotsContainer = document.getElementById('category-dots-container');
+                        const slides = Array.from(document.querySelectorAll('.category-slide'));
+                        const menuItems = Array.from(document.querySelectorAll('.menu-item'));
+
+                        let currentSlide = 0;
+                        let slidesPerView = calculateSlidesPerView();
+
+                        function calculateSlidesPerView() {
+                            if (window.innerWidth < 576) return 2;
+                            if (window.innerWidth < 768) return 3;
+                            if (window.innerWidth < 992) return 4;
+                            return 5;
+                        }
+
+                        function updateSlider() {
+                            const slideWidth = slides[0].offsetWidth + 10;
+                            const translateX = -currentSlide * slideWidth;
+                            slider.style.transform = `translateX(${translateX}px)`;
+                            updateDots();
+                        }
+
+                        function updateDots() {
+                            dotsContainer.innerHTML = '';
+                            const dotCount = Math.ceil(slides.length / slidesPerView);
+
+                            for (let i = 0; i < dotCount; i++) {
+                                const dot = document.createElement('span');
+                                dot.className = 'category-dot';
+                                if (i === Math.floor(currentSlide / slidesPerView)) {
+                                    dot.classList.add('active');
+                                }
+                                dot.addEventListener('click', () => {
+                                    currentSlide = i * slidesPerView;
+                                    updateSlider();
+                                });
+                                dotsContainer.appendChild(dot);
+                            }
+                        }
+
+                        function filterMenuItems(menuTypeId) {
+                            // Hide all menu items
+                            menuItems.forEach(item => {
+                                item.classList.remove('show');
+                            });
+
+                            // Show items matching the selected category
+                            document.querySelectorAll(`.menu-item[data-menutypeid="${menuTypeId}"]`).forEach(item => {
+                                item.classList.add('show');
+                            });
+                        }
+
+                        function nextSlide() {
+                            if (currentSlide < slides.length - slidesPerView) {
+                                currentSlide++;
+                                updateSlider();
+                            }
+                        }
+
+                        function prevSlide() {
+                            if (currentSlide > 0) {
+                                currentSlide--;
+                                updateSlider();
+                            }
+                        }
+
+                        // Event listeners
+                        nextBtn.addEventListener('click', nextSlide);
+                        prevBtn.addEventListener('click', prevSlide);
+
+                        // Handle category selection
+                        slides.forEach((slide, index) => {
+                            const link = slide.querySelector('a');
+
+                            link.addEventListener('click', (e) => {
+                                // Prevent default if we're handling the filtering ourselves
+                                e.preventDefault();
+
+                                // Update active state
+                                slides.forEach(s => {
+                                    const sLink = s.querySelector('a');
+                                    sLink.classList.remove('active', 'ms-0', 'pb-3');
+                                    sLink.classList.add('pb-3');
+                                });
+
+                                link.classList.add('active', 'ms-0', 'pb-3');
+                                link.classList.remove('pb-3');
+
+                                // Filter menu items
+                                const menuTypeId = slide.getAttribute('data-menutypeid');
+                                filterMenuItems(menuTypeId);
+
+                                // Update slider position if needed
+                                currentSlide = index;
+                                updateSlider();
+                            });
+                        });
+
+                        // Handle window resize
+                        window.addEventListener('resize', () => {
+                            const newSlidesPerView = calculateSlidesPerView();
+                            if (newSlidesPerView !== slidesPerView) {
+                                slidesPerView = newSlidesPerView;
+                                currentSlide = Math.min(currentSlide, slides.length - slidesPerView);
+                                updateSlider();
+                            }
+                        });
+
+                        // Initialize
+                        updateSlider();
+
+                        // Show breakfast items by default
+                        filterMenuItems('1');
+                    }
+
+                    // Initialize the slider
+                    initCategorySlider();
+                });
+
+
+            </script>
+
+                
                 <div class="tab-content">
                 @foreach (var type in Model.MenuTypes)
                 {
@@ -84,6 +399,9 @@
                 }
                 
                 </div>
+           
+            
+            
             </div>
         </div>
     </div>
@@ -91,17 +409,44 @@
 <!-- Cart Page -->
 <div class="cart-page" id="cart-page">
     <div class="cart-content">
-        <button class="close-cart" id="close-cart">Close</button>
-        <h2>Shopping Cart</h2>
-        <div id="cart-items"></div>
-        <div class="total-price">Cart Total: $<span id="cart-total">0.00</span></div>
-        <button class="cart-order-btn" id="cart-order-btn">Order Now</button>
+        <button class="close-cart" id="close-cart" aria-label="Close cart">Close</button>
+        <h2 class="mb-4"><i class="fas fa-shopping-cart me-2"></i>Your Order</h2>
+        <div id="cart-items">
+            <div class="empty-cart">
+                <i class="fas fa-shopping-cart"></i>
+                <h5>Your cart is empty</h5>
+                <p>Add some delicious items to get started!</p>
+            </div>
+        </div>
+        <div class="total-price">Total: $<span id="cart-total">0.00</span></div>
+        <button class="cart-order-btn" id="cart-order-btn" disabled>Place Order</button>
     </div>
 </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         let cart = [];
+
+
+
+        let tabLinks = document.querySelectorAll('[data-bs-toggle="pill"]');
+
+        tabLinks.forEach(link => {
+            link.addEventListener("click", function (event) {
+                event.preventDefault();
+                let tabId = this.getAttribute("href");
+
+                // Remove 'active' class from all tab links and content
+                document.querySelectorAll(".tab-pane").forEach(tab => tab.classList.remove("active", "show"));
+                document.querySelectorAll('[data-bs-toggle="pill"]').forEach(link => link.classList.remove("active"));
+
+                // Activate the clicked tab
+                this.classList.add("active");
+                document.querySelector(tabId).classList.add("active", "show");
+            });
+        });
+
+
 
         const cartToggle = document.getElementById('cart-toggle');
         const cartPage = document.getElementById('cart-page');
@@ -225,6 +570,11 @@
 
 
         updateCart();
+
+
     });
 
 </script>
+
+ 
+

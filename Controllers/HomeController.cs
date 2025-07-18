@@ -3,10 +3,6 @@ using Estonia.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using System.Diagnostics;
-
- 
-   
-
 using System.Data.SqlClient;
 using Microsoft.Extensions.Options;
 

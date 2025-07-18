@@ -1,66 +1,101 @@
 ﻿<!DOCTYPE html>
 
+
 <head>
     <meta charset="utf-8">
-    <title>AP-Resturant</title>
+     
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
 
-    <!-- Favicon -->
-    <link href="~/img/favicon.ico" rel="icon">
+     <!-- Favicon -->
+     <link href="~/img/favicon.ico" rel="icon">
 
+     <!-- Google Web Fonts -->
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Nunito:wght@600;700;800&family=Pacifico&display=swap" rel="stylesheet">
+ 
+     <!-- Icon Font Stylesheet -->
+     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+ 
+     <!-- Libraries Stylesheet -->
+     <link href="~/lib/animate/animate.min.css" rel="stylesheet">
+     <link href="~/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+     <link href="~/lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css" rel="stylesheet" />
+ 
+     <!-- Customized Bootstrap Stylesheet -->
+     <link href="~/css/bootstrap.min.css" rel="stylesheet">
+ 
+     <!-- Template Stylesheet -->
+     <link href="~/css/style.css" rel="stylesheet">
 
-    <!-- Google Web Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Nunito:wght@600;700;800&family=Pacifico&display=swap" rel="stylesheet">
-
-    <!-- Icon Font Stylesheet -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
-
-    <!-- Libraries Stylesheet -->
-    <link href="~/lib/animate/animate.min.css" rel="stylesheet">
-    <link href="~/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
-    <link href="~/lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css" rel="stylesheet" />
-
-    <link href="~/css/bootstrap.min.css" rel="stylesheet">
-    <link href="~/css/style.css" rel="stylesheet">
-
-
+    <!-- Custom CSS -->
     <style>
+        /* Base Styles */
+        body {
+            font-family: 'Nunito', sans-serif;
+            overflow-x: hidden;
+        }
+        
+        /* Quantity Control Styles */
         .quantity-control {
             display: flex;
             align-items: center;
-            margin-bottom: 20px;
+            margin: 10px 0;
         }
-
+        
         .qty-btn {
             width: 30px;
             height: 30px;
             background: #FEA116;
-            border: 1px solid #FEA116;
+            color: white;
+            border: none;
             font-size: 16px;
             cursor: pointer;
             border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
         }
-
+        
+        .qty-btn:hover {
+            background: #FEA116;
+            transform: scale(1.05);
+        }
+        
+        .qty-btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
         .qty-input {
             width: 50px;
             height: 30px;
             text-align: center;
             margin: 0 10px;
-            border: 1px solid #FEA116;
+            border: 1px solid #ddd;
             border-radius: 4px;
-        }
-
-        .total-price {
-            margin-top: 10px;
-            text-align: right;
             font-weight: bold;
         }
+        
+        /* Cart Styles */
+        .total-price {
+            margin-top: 20px;
+            text-align: -webkit-center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            padding: 12px;
+            background: #FEA116;
+            border-radius: 50px;
+            border: 1px solid #eee;
+            color: #ffffff;
+        }
 
+        /* Cart Page Styles */
         .cart-page {
             display: none;
             position: fixed;
@@ -69,26 +104,68 @@
             width: 100%;
             height: 100%;
             background: rgba(0,0,0,0.5);
-            z-index: 1000;
+            z-index: 1050;
+            overflow-y: auto;
         }
 
         .cart-content {
             background: white;
-            width: 400px;
+            width: 90%;
+            max-width: 500px;
             margin: 50px auto;
-            padding: 20px;
+            padding: 25px;
             border-radius: 8px;
-            max-height: 80vh;
-            overflow-y: auto;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+            position: relative;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @@keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         .cart-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin: 10px 0;
-            padding: 10px;
-            border-bottom: 1px solid #eee;
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 8px;
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+
+        .cart-item:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .cart-item-info {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+
+        .cart-item-img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-right: 15px;
+            border: 1px solid #eee;
+        }
+
+        .cart-item-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .cart-item-price {
+            color: #FEA116;
+            font-weight: bold;
+            font-size: 0.9rem;
         }
 
         .cart-quantity-control {
@@ -106,44 +183,198 @@
             cursor: pointer;
         }
 
-        .cart-order-btn {
-            margin-top: 20px;
-            width: 100%;
-            padding: 10px;
-            background: #FEA116;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background 0.3s;
+        .close-cart:hover {
+            background: #c1121f;
         }
 
-            .cart-order-btn:hover {
-                background: #FEA116;
-            }
+        .cart-order-btn {
+            margin-top: 25px;
+            width: 100%;
+            padding: 12px;
+            background: #FEA116;
+            color: #fff;;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
-            .cart-order-btn:disabled {
-                background: #cccccc;
-                cursor: not-allowed;
-            }
+        .cart-order-btn:hover {
+            background: #FEA116;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(42, 157, 143, 0.3);
+        }
 
+        .cart-order-btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Cart Button in Navbar */
         .cart-btn {
             background: #FEA116;
             color: white;
             border: none;
-            padding: 8px 15px;
+            padding: 8px 20px;
             border-radius: 4px;
             cursor: pointer;
             position: relative;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s;
+            margin-left: 15px;
+            font-weight: 600;
         }
 
-            .cart-btn .badge {
-                font-size: 12px;
-            }
-    </style>
+        .cart-btn:hover {
+            background: #d98b14;
+            transform: translateY(-2px);
+        }
 
+        .cart-btn .badge {
+            font-size: 12px;
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #e63946 !important;
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1100;
+        }
+
+        .toast {
+            background: #FEA116;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            animation: fadeIn 0.3s;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .toast i {
+            margin-right: 10px;
+        }
+
+        @@keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @@keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        /* Empty Cart State */
+        .empty-cart {
+            text-align: center;
+            padding: 30px;
+            color: #6c757d;
+        }
+
+        .empty-cart i {
+            font-size: 50px;
+            margin-bottom: 15px;
+            color: #dee2e6;
+        }
+
+        .empty-cart h5 {
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        /* Add to Cart Button */
+        .add-to-cart-btn {
+            margin-top: 10px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .add-to-cart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(254, 161, 22, 0.3);
+        }
+
+        .add-to-cart-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Menu Item Styles */
+        .menu-item {
+            transition: all 0.3s;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .menu-item:hover {
+            background: #f8f9fa;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+
+        /* Responsive Adjustments */
+        @@media (max-width: 768px) {
+            .cart-content {
+                width: 95%;
+                margin: 20px auto;
+                padding: 20px;
+            }
+            
+            .cart-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .cart-quantity-control {
+                margin-top: 10px;
+                width: 100%;
+                justify-content: flex-end;
+            }
+            
+            .cart-btn {
+                padding: 6px 12px;
+                font-size: 0.9rem;
+                margin-left: 10px;
+            }
+        }
+
+        /* Spinner Styles */
+        #spinner {
+            background: rgba(255,255,255,0.8);
+            z-index: 9999;
+        }
+
+        /* Tab Styles */
+        .nav-pills .nav-link.active {
+            background-color: #FEA116;
+        }
+
+        .nav-pills .nav-link {
+            color: #495057;
+            transition: all 0.3s;
+        }
+
+        .nav-pills .nav-link:hover {
+            color: #FEA116;
+        }
+    </style>
 </head>
+
 <body>
     <div class="container-xxl bg-white p-0">
         <!-- Spinner Start -->
@@ -156,9 +387,8 @@
         <!-- Navbar & Hero Start -->
         <div class="container-xxl position-relative p-0">
             <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-4 px-lg-5 py-3 py-lg-0">
-                <a href="" class="navbar-brand p-0">
-                    <h1 class="text-primary m-0"><i class="fa fa-utensils me-3"></i>Restoran</h1>
-                    <!-- <img src="img/logo.png" alt="Logo"> -->
+                <a href="/" class="navbar-brand p-0">
+                    <h1 class="text-primary m-0"><i class="fa fa-utensils me-3"></i>AP Restaurant</h1>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
                     <span class="fa fa-bars"></span>
@@ -331,6 +561,6 @@
         <!-- Template Javascript -->
         <script src="~/js/main.js"></script>
 
- 
+
 </body>
 </html>
